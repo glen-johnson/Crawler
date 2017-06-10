@@ -1,6 +1,5 @@
 package com.jacamars.crawler;
 
-
 import java.io.File;
 import java.net.URL;
 import java.io.IOException;
@@ -166,7 +165,7 @@ public class Worker implements Runnable {
     				try {
 					response = Jsoup.connect(url).followRedirects(false).validateTLSCertificates(false).userAgent(userAgent).timeout(timeout).execute();
 				} catch (IOException e) {
-					System.out.println("IO Exception: " + e);
+					//System.out.println("IO Exception: " + e);
 					String message = e.getMessage();
 					if(message != null) {
 				    		return(link + "IO Error: " + message);
