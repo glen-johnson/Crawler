@@ -37,7 +37,7 @@ public class Main {
 			System.out.println("FATAL: folder not provided\n");
 		}
 		else {
-			System.out.println("FOLDER: " + path + "/" + folder);
+			// System.out.println("FOLDER: " + path + "/" + folder);
 			Main main = new Main(path,workers,folder);
 		}
 		
