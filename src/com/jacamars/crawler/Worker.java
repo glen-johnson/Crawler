@@ -174,10 +174,10 @@ public class Worker implements Runnable {
 					//System.out.println("IO Exception: " + e);
 					String message = e.getMessage();
 					if(message != null) {
-				    		return(link + "IO Error: " + message + "\n");
+				    		return(link + "\t\tIO Error: " + message + "\n");
 					}
 					else {
-				    		return(link + "unknown IO Error" + "\n");
+				    		return(link + "\t\tunknown IO Error" + "\n");
 					}
 				}
 			   
