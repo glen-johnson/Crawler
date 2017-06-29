@@ -17,6 +17,7 @@ public class Main {
 		String folder = "homepages";
 		int workers = 100; // set to 1 to debug single threaded
 		int i = 0;
+		String verify = "true";
 		while(i < args.length) {
 			switch(args[i]) {
 			case "-path":
@@ -31,6 +32,10 @@ public class Main {
 				folder = args[i+1];
 				i+=2;
 				break;
+			case "-verify":
+				verify = args[i+1];
+				i+=2;
+				break;
 			}
 		}
 		if(folder == null) {
@@ -38,12 +43,12 @@ public class Main {
 		}
 		else {
 			// System.out.println("FOLDER: " + path + "/" + folder);
-			Main main = new Main(path,workers,folder);
+			Main main = new Main(path,workers,folder,verify);
 		}
 		
 	}
 	
-	public Main(String path, int nw, String folder) throws Exception {
+	public Main(String path, int nw, String folder, String verify) throws Exception {
 	
 		String file = path + "/ip_fetchlist.txt";
 		File f = new File(file);
@@ -90,6 +95,9 @@ public class Main {
 			sb.append(parts[1]);
 			sb.append(",");
 			sb.append(hpFolder);
+			sb.append(",");
+			sb.append(verify);
+
 			Worker w = workers.get(k++);
 			w.offer(sb.toString());
 			if (k == workers.size()) k = 0;
