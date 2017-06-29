@@ -66,6 +66,7 @@ public class Worker implements Runnable {
     		// For the 'big' fetchlist, use the Windows UserAgent and the Crawler UserAgent for 'seed'
     		String userAgent = crawlerUserAgent;
         	Boolean followRedirects = false;
+        	Boolean verify = true;
 		
     		try {
     			String host = InetAddress.getLocalHost().getHostName();
@@ -83,12 +84,17 @@ public class Worker implements Runnable {
 			String [] parts = url.split(",");
 			String link     = parts[0];
 			String folder   = parts[1];
+			String vs       = parts[2];
+			if(vs != null && vs.contains("false")) {
+				// System.out.println("VERIFICATION IS OFF");
+				verify = false;
+			}
 			
 			
 			
 			// System.out.println(myCount + " Going to work on: " + link);
 			try {
-					result = doTheWork(link, folder, userAgent, followRedirects);
+					result = doTheWork(link, folder, userAgent, followRedirects, verify);
 					if(result != null && result.length() > 1) {
 						badUrls.add(result);
 					}
@@ -116,7 +122,7 @@ public class Worker implements Runnable {
 	
 	//////////////////////////////////////////////////////////////////////
 	
-	private String doTheWork(String url, String folder, String userAgent, Boolean followRedirects) throws Exception{
+	private String doTheWork(String url, String folder, String userAgent, Boolean followRedirects, Boolean verify) throws Exception{
 
 		String fileName = url.substring(7);
 		fileName = fileName.replaceAll("[^A-Za-z0-9\\-.]", "_");
@@ -168,10 +174,10 @@ public class Worker implements Runnable {
 					//System.out.println("IO Exception: " + e);
 					String message = e.getMessage();
 					if(message != null) {
-				    		return(link + "IO Error: " + message);
+				    		return(link + "IO Error: " + message + "\n");
 					}
 					else {
-				    		return(link + "unknown IO Error");
+				    		return(link + "unknown IO Error" + "\n");
 					}
 				}
 			   
@@ -246,10 +252,13 @@ public class Worker implements Runnable {
 	        
 	        	// collect <meta name tag info in <head> section
 	        	String meta = getMeta(doc);
-	        	if(meta == null || meta.length() < 10) {
-	        		String reason = link + "\t\tno_meta_lines\n";
-	        		return(reason);
-	        	}
+			if(verify == true) {
+	    			// System.out.println("TESTING META");
+	        		if(meta == null || meta.length() < 10) {
+	        			String reason = link + "\t\tno_meta_lines\n";
+	        			return(reason);
+				}
+			}
 	        	
 
 	        
@@ -270,17 +279,25 @@ public class Worker implements Runnable {
 		        
 		        // collect all links and anchors
 		        String links = getLinks(doc, domain_name);
-		        if(links == null || links.length() < 10) {
-		        	String result = link + "\t\tno_links\n";
-		        	return(result);        	
+			if(verify == true) {
+			        if(links == null || links.length() < 10) {
+		        		String result = link + "\t\tno_links\n";
+		        		return(result);        	
+				}
 		        }
 		        
-		        output.append("META_HEADERS:\n");
-		        output.append(meta);
+			if(meta != null) {
+		        	output.append("META_HEADERS:\n");
+		        	output.append(meta);
+			}
+
 		        output.append("\n\nVISIBLE_TEXT:\n");
 		        output.append(plainText);
-		        output.append("\n\nALL_LINKS:\n");
-		        output.append(links);
+
+			if(links != null) {
+		        	output.append("\n\nALL_LINKS:\n");
+		        	output.append(links);
+			}
 		        
 		        String title = getTitle(doc);
 		        if(title != null) {
